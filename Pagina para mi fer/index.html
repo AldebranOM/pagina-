@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Quieres ser mi novia?</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .main-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #ffeb3b;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-shadow: 0 0 20px #ffeb3b;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            background-color: #ffeb3b;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 10px #ffeb3b;
+        }
+
+        button:hover {
+            background-color: #fff176;
+            box-shadow: 0 0 15px #fff176;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.3s, opacity 0.3s;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            position: absolute;
+            text-align: center;
+            color: white;
+            font-size: 1.5rem;
+            font-family: Arial, sans-serif;
+            max-width: 90%;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="flowerCanvas"></canvas>
+    <div class="main-content">
+        <h1>¿Quieres ser mi novia?</h1>
+        <p>Eres la luz de mi vida, y este es mi pequeño gesto para demostrarlo.</p>
+        <button id="yesButton">solo hay un camino para esta respuesta.</button>
+    </div>
+    <div class="modal" id="modal">
+        <canvas id="modalCanvas"></canvas>
+        <div class="modal-content">
+            <p>Fernanda, desde que te conocí, cada momento contigo ilumina mi vida de una manera especial.</p>
+            <p>Eres esa chispa que hace todo más bonito. ¿Te gustaría ser la razón de mi sonrisa todos los días?</p>
+            <p>Espero que esto demuestre un poco de lo mucho que te quiero y de lo mucho que me importas.</p>
+            <p>Con cariño, Néstor.</p>
+        </div>
+    </div>
+
+    <!-- Música de fondo -->
+    <audio autoplay loop>
+        <source src="audio/cancion.mp3" type="audio/mp3">
+        Tu navegador no soporta la reproducción de audio.
+    </audio>
+
+    <script>
+        const canvas = document.getElementById('flowerCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Flower {
+            constructor(x, y, radius, petalCount, color) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                this.petalCount = petalCount;
+                this.color = color;
+                this.angle = 0;
+                this.speed = Math.random() * 0.02 + 0.01;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                ctx.shadowColor = '#ffeb3b';
+                ctx.shadowBlur = 15;
+
+                for (let i = 0; i < this.petalCount; i++) {
+                    ctx.beginPath();
+                    ctx.rotate((Math.PI * 2) / this.petalCount);
+                    ctx.moveTo(0, 0);
+                    ctx.quadraticCurveTo(
+                        this.radius / 2,
+                        -this.radius,
+                        this.radius,
+                        0
+                    );
+                    ctx.quadraticCurveTo(
+                        this.radius / 2,
+                        this.radius,
+                        0,
+                        0
+                    );
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                    ctx.closePath();
+                }
+
+                ctx.restore();
+            }
+
+            update() {
+                this.angle += this.speed;
+                this.x += Math.sin(this.angle) * 0.5;
+                this.y += Math.cos(this.angle) * 0.5;
+
+                if (
+                    this.x < -this.radius ||
+                    this.x > canvas.width + this.radius ||
+                    this.y < -this.radius ||
+                    this.y > canvas.height + this.radius
+                ) {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                }
+            }
+        }
+
+        const flowers = [];
+        for (let i = 0; i < 50; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            const radius = Math.random() * 20 + 10;
+            const petalCount = Math.floor(Math.random() * 6) + 4;
+            const color = '#ffeb3b';
+            flowers.push(new Flower(x, y, radius, petalCount, color));
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            flowers.forEach((flower) => {
+                flower.update();
+                flower.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        const modal = document.getElementById('modal');
+        const modalCanvas = document.getElementById('modalCanvas');
+        const modalCtx = modalCanvas.getContext('2d');
+        modalCanvas.width = window.innerWidth;
+        modalCanvas.height = window.innerHeight;
+
+        function drawHeartOutline(ctx, x, y, size, color) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.beginPath();
+            ctx.moveTo(0, -size / 2);
+            ctx.bezierCurveTo(
+                size / 2, -size,
+                size, size / 4,
+                0, size
+            );
+            ctx.bezierCurveTo(
+                -size, size / 4,
+                -size / 2, -size,
+                0, -size / 2
+            );
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 5;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 15;
+            ctx.stroke();
+            ctx.closePath();
+            ctx.restore();
+        }
+
+        function drawModalBackground() {
+            modalCtx.clearRect(0, 0, modalCanvas.width, modalCanvas.height);
+            drawHeartOutline(modalCtx, modalCanvas.width / 2, modalCanvas.height / 2, 200, '#00ff00');
+        }
+
+        document.getElementById('yesButton').addEventListener('click', () => {
+            modal.classList.add('active');
+            drawModalBackground();
+        });
+    </script>
+</body>
+</html>
